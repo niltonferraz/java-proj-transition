@@ -1,48 +1,40 @@
 package com.transicao.orcamentos.controller;
 
 import com.transicao.orcamentos.model.Orcamento;
+import com.transicao.orcamentos.repository.OrcamentoRepository;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/orcamentos")
 public class OrcamentoController {
 
-    private final List<Orcamento> orcamentos = new ArrayList<>();
-    private Long proximoId = 1L;
+    private final OrcamentoRepository repository;
 
-    public OrcamentoController() {
-        // Dados de teste para inicializar
-        orcamentos.add(new Orcamento(proximoId++, "Empresa A", "Manutenção de Software", new BigDecimal("1500.00"), "PENDENTE"));
-        orcamentos.add(new Orcamento(proximoId++, "Empresa B", "Consultoria de QA", new BigDecimal("3200.00"), "APROVADO"));
+    // Injeção de dependência via construtor
+    public OrcamentoController(OrcamentoRepository repository) {
+        this.repository = repository;
     }
 
-    // GET: Listar todos os orçamentos
+    // GET: Listar todos do Banco
     @GetMapping
     public List<Orcamento> listarTodos() {
-        return orcamentos;
+        return repository.findAll();
     }
 
-    // POST: Cadastrar um novo orçamento
+    // GET: Buscar por ID no Banco
+    @GetMapping("/{id}")
+    public Orcamento buscarPorId(@PathVariable Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    // POST: Salvar no Banco
     @PostMapping
     public Orcamento criar(@RequestBody Orcamento novoOrcamento) {
-        novoOrcamento.setId(proximoId++);
         if (novoOrcamento.getStatus() == null) {
             novoOrcamento.setStatus("PENDENTE");
         }
-        orcamentos.add(novoOrcamento);
-        return novoOrcamento;
-    }
-
-    // GET: Buscar um orçamento específico por ID
-    @GetMapping("/{id}")
-    public Orcamento buscarPorId(@PathVariable Long id) {
-        return orcamentos.stream()
-                .filter(o -> o.getId().equals(id))
-                .findFirst()
-                .orElse(null); // Retorna o orçamento se achar, ou null
+        return repository.save(novoOrcamento);
     }
 }
