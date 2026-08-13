@@ -1,0 +1,2 @@
+INSERT INTO tb_orcamento (cliente, descricao, valor_total, status) VALUES ('Empresa Alfa', 'Desenvolvimento de API', 4500.00, 'PENDENTE');
+INSERT INTO tb_orcamento (cliente, descricao, valor_total, status) VALUES ('Empresa Beta', 'Automação de Testes', 2800.00, 'APROVADO');

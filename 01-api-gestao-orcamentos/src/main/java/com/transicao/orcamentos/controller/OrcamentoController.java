@@ -1,7 +1,11 @@
 package com.transicao.orcamentos.controller;
 
-import com.transicao.orcamentos.model.Orcamento;
-import com.transicao.orcamentos.repository.OrcamentoRepository;
+import com.transicao.orcamentos.dto.OrcamentoRequestDTO;
+import com.transicao.orcamentos.dto.OrcamentoResponseDTO;
+import com.transicao.orcamentos.service.OrcamentoService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,31 +14,37 @@ import java.util.List;
 @RequestMapping("/api/orcamentos")
 public class OrcamentoController {
 
-    private final OrcamentoRepository repository;
+    private final OrcamentoService service;
 
-    // Injeção de dependência via construtor
-    public OrcamentoController(OrcamentoRepository repository) {
-        this.repository = repository;
+    public OrcamentoController(OrcamentoService service) {
+        this.service = service;
     }
 
-    // GET: Listar todos do Banco
     @GetMapping
-    public List<Orcamento> listarTodos() {
-        return repository.findAll();
+    public ResponseEntity<List<OrcamentoResponseDTO>> listarTodos() {
+        return ResponseEntity.ok(service.listarTodos());
     }
 
-    // GET: Buscar por ID no Banco
     @GetMapping("/{id}")
-    public Orcamento buscarPorId(@PathVariable Long id) {
-        return repository.findById(id).orElse(null);
+    public ResponseEntity<OrcamentoResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    // POST: Salvar no Banco
     @PostMapping
-    public Orcamento criar(@RequestBody Orcamento novoOrcamento) {
-        if (novoOrcamento.getStatus() == null) {
-            novoOrcamento.setStatus("PENDENTE");
-        }
-        return repository.save(novoOrcamento);
+    public ResponseEntity<OrcamentoResponseDTO> criar(@Valid @RequestBody OrcamentoRequestDTO dto) {
+        OrcamentoResponseDTO criado = service.criar(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OrcamentoResponseDTO> atualizar(@PathVariable Long id, @Valid @RequestBody OrcamentoRequestDTO dto) {
+        OrcamentoResponseDTO atualizado = service.atualizar(id, dto);
+        return ResponseEntity.ok(atualizado);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }

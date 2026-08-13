@@ -1,41 +1,34 @@
-package com.transicao.orcamentos.model;
+package com.transicao.orcamentos.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "tb_orcamento")
-public class Orcamento {
+public class OrcamentoRequestDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @NotBlank(message = "O nome do cliente é obrigatório.")
     private String cliente;
 
+    @NotBlank(message = "A descrição do orçamento é obrigatória.")
     private String descricao;
 
+    @NotNull(message = "O valor total é obrigatório.")
+    @Positive(message = "O valor total deve ser maior que zero.")
     private BigDecimal valorTotal;
 
     private String status;
 
-    public Orcamento() {
+    public OrcamentoRequestDTO() {
     }
 
-    public Orcamento(Long id, String cliente, String descricao, BigDecimal valorTotal, String status) {
-        this.id = id;
+    public OrcamentoRequestDTO(String cliente, String descricao, BigDecimal valorTotal, String status) {
         this.cliente = cliente;
         this.descricao = descricao;
         this.valorTotal = valorTotal;
         this.status = status;
     }
 
-    // Getters e Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
     public String getCliente() { return cliente; }
     public void setCliente(String cliente) { this.cliente = cliente; }
     public String getDescricao() { return descricao; }
